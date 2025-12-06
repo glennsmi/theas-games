@@ -1,0 +1,53 @@
+{
+  "name": "glenn-dev-template",
+  "version": "1.0.0",
+  "description": "React + Vite + Firebase template with Tailwind v4 and shared models",
+  "type": "module",
+  "workspaces": [
+    "functions",
+    "shared"
+  ],
+  "scripts": {
+    "setup": "node setup.js",
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "functions:dev": "npm run dev --workspace=functions",
+    "functions:build": "npm run build --workspace=functions",
+    "shared:build": "npm run build --workspace=shared",
+    "firebase:emulators": "firebase emulators:start",
+    "firebase:deploy": "firebase deploy --only functions",
+    "install:all": "npm install && npm install --workspace=functions && npm install --workspace=shared",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0"
+  },
+  "dependencies": {
+    "@radix-ui/react-slot": "^1.2.4",
+    "@types/canvas-confetti": "^1.9.0",
+    "canvas-confetti": "^1.9.4",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "firebase": "^10.14.1",
+    "lucide-react": "^0.556.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.20.0",
+    "tailwind-merge": "^3.4.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.0.0-alpha.19",
+    "@types/node": "^20.10.0",
+    "@types/react": "^18.2.43",
+    "@types/react-dom": "^18.2.17",
+    "@typescript-eslint/eslint-plugin": "^6.14.0",
+    "@typescript-eslint/parser": "^6.14.0",
+    "@vitejs/plugin-react": "^4.2.1",
+    "eslint": "^8.55.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.5",
+    "firebase-tools": "^13.0.0",
+    "tailwindcss": "^4.0.0-alpha.19",
+    "typescript": "^5.2.2",
+    "vite": "^5.0.8"
+  },
+  "private": true
+}

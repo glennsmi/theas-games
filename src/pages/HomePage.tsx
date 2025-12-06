@@ -1,0 +1,91 @@
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { Link } from 'react-router-dom'
+
+
+export default function HomePage() {
+  return (
+    <div className="flex flex-col items-center justify-center min-h-[80vh] space-y-12">
+      {/* Hero Section */}
+      <div className="text-center space-y-6 max-w-3xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-1000">
+        <div className="relative mx-auto w-64 h-64 md:w-80 md:h-80 mb-8">
+          <img
+            src="/Theas_games_logo_500x500.png"
+            alt="Thea's Games Logo"
+            className="w-full h-full object-contain drop-shadow-xl hover:scale-105 transition-transform duration-300"
+          />
+        </div>
+
+        <h1 className="text-5xl md:text-6xl font-bold text-dark-navy tracking-tight drop-shadow-sm">
+          Thea's Games
+        </h1>
+
+        <p className="text-xl md:text-2xl text-dark-navy/80 max-w-2xl mx-auto font-medium">
+          A magical underwater world of fun, learning, and ocean conservation.
+        </p>
+
+        <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
+          <Link to="/game">
+            <Button size="lg" className="text-lg px-8 py-6 rounded-full shadow-lg hover:shadow-xl transition-all bg-medium-teal hover:bg-light-teal text-white border-2 border-white/20">
+              Play Now
+            </Button>
+          </Link>
+          <Button variant="secondary" size="lg" className="text-lg px-8 py-6 rounded-full shadow-md hover:shadow-lg transition-all bg-medium-purple hover:bg-deep-purple text-white">
+            Create Account
+          </Button>
+        </div>
+      </div>
+
+      {/* Game Modes Section */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-5xl px-4">
+        <Card className="bg-white/90 backdrop-blur-sm border-2 border-pale-aqua hover:border-medium-teal transition-all duration-300 hover:shadow-xl transform hover:-translate-y-1 group">
+          <CardHeader>
+            <CardTitle className="text-2xl text-dark-navy group-hover:text-medium-teal transition-colors">Simple Match</CardTitle>
+            <CardDescription className="text-medium-purple font-medium">Classic Memory Game</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p className="text-dark-navy/70">
+              Flip shells to find matching pairs of tropical fish, seahorses, and more! Perfect for beginners.
+            </p>
+          </CardContent>
+          <CardFooter>
+            <Link to="/game" className="w-full">
+              <Button variant="outline" className="w-full border-medium-teal text-medium-teal hover:bg-medium-teal hover:text-white">
+                Start Game
+              </Button>
+            </Link>
+          </CardFooter>
+        </Card>
+
+        <Card className="bg-white/90 backdrop-blur-sm border-2 border-pale-aqua hover:border-medium-teal transition-all duration-300 hover:shadow-xl transform hover:-translate-y-1 group">
+          <CardHeader>
+            <CardTitle className="text-2xl text-dark-navy group-hover:text-medium-teal transition-colors">Educational Match</CardTitle>
+            <CardDescription className="text-medium-purple font-medium">Learn While You Play</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p className="text-dark-navy/70">
+              Match creatures to their names, baby animals to their parents, and explore the ocean's secrets.
+            </p>
+          </CardContent>
+          <CardFooter>
+            <Link to="/game" className="w-full">
+              <Button variant="outline" className="w-full border-medium-teal text-medium-teal hover:bg-medium-teal hover:text-white">
+                Start Learning
+              </Button>
+            </Link>
+          </CardFooter>
+        </Card>
+      </div>
+
+      {/* Conservation Message */}
+      <div className="max-w-4xl mx-auto text-center p-8 bg-white/60 backdrop-blur-md rounded-2xl border border-white/40 shadow-sm">
+        <h2 className="text-2xl font-bold text-dark-navy mb-2">Protect Our Oceans</h2>
+        <p className="text-dark-navy/80">
+          Every game you play helps us learn more about the beautiful creatures that call the ocean home.
+        </p>
+      </div>
+    </div>
+  )
+}
+
+

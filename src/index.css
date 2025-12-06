@@ -1,0 +1,145 @@
+@import "tailwindcss";
+
+@theme {
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+
+  --animate-accordion-down: accordion-down 0.2s ease-out;
+  --animate-accordion-up: accordion-up 0.2s ease-out;
+
+  @keyframes accordion-down {
+    from {
+      height: 0
+    }
+
+    to {
+      height: var(--radix-accordion-content-height)
+    }
+  }
+
+  @keyframes accordion-up {
+    from {
+      height: var(--radix-accordion-content-height)
+    }
+
+    to {
+      height: 0
+    }
+  }
+}
+
+@layer base {
+  :root {
+    /* Thea's Games Palette */
+    --light-teal: #5DD3C3;
+    --medium-teal: #40B5A8;
+    --dark-navy: #1E3A5F;
+    --medium-purple: #8B6BB5;
+    --deep-purple: #6B4D94;
+    --sandy-coral: #F4A460;
+    --bright-coral: #FF9966;
+    --pale-aqua: #98E8DC;
+    --ice-aqua: #B8F0E8;
+
+    /* Shadcn Mappings */
+    --background: var(--ice-aqua);
+    --foreground: var(--dark-navy);
+
+    --card: #ffffff;
+    --card-foreground: var(--dark-navy);
+
+    --popover: #ffffff;
+    --popover-foreground: var(--dark-navy);
+
+    --primary: var(--light-teal);
+    --primary-foreground: var(--dark-navy);
+
+    --secondary: var(--medium-purple);
+    --secondary-foreground: #ffffff;
+
+    --muted: var(--pale-aqua);
+    --muted-foreground: var(--medium-teal);
+
+    --accent: var(--sandy-coral);
+    --accent-foreground: #ffffff;
+
+    --destructive: #ef4444;
+    --destructive-foreground: #ffffff;
+
+    --border: var(--medium-teal);
+    --input: var(--medium-teal);
+    --ring: var(--light-teal);
+
+    --radius: 0.75rem;
+  }
+
+  .dark {
+    /* Dark mode mappings if needed, but PRD specifies light/airy */
+    --background: var(--dark-navy);
+    --foreground: var(--ice-aqua);
+
+    --card: var(--deep-purple);
+    --card-foreground: var(--ice-aqua);
+
+    --popover: var(--deep-purple);
+    --popover-foreground: var(--ice-aqua);
+
+    --primary: var(--medium-teal);
+    --primary-foreground: #ffffff;
+
+    --secondary: var(--medium-purple);
+    --secondary-foreground: #ffffff;
+
+    --muted: var(--deep-purple);
+    --muted-foreground: var(--pale-aqua);
+
+    --accent: var(--bright-coral);
+    --accent-foreground: #ffffff;
+
+    --destructive: #7f1d1d;
+    --destructive-foreground: #ffffff;
+
+    --border: var(--medium-purple);
+    --input: var(--medium-purple);
+    --ring: var(--medium-teal);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Inter', sans-serif;
+  }
+}
