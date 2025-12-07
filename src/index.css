@@ -28,6 +28,17 @@
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
 
+  /* Thea's Games Palette */
+  --color-light-teal: #5DD3C3;
+  --color-medium-teal: #40B5A8;
+  --color-dark-navy: #1E3A5F;
+  --color-medium-purple: #8B6BB5;
+  --color-deep-purple: #6B4D94;
+  --color-sandy-coral: #F4A460;
+  --color-bright-coral: #FF9966;
+  --color-pale-aqua: #98E8DC;
+  --color-ice-aqua: #B8F0E8;
+
   --radius-lg: var(--radius);
   --radius-md: calc(var(--radius) - 2px);
   --radius-sm: calc(var(--radius) - 4px);
@@ -52,6 +63,22 @@
 
     to {
       height: 0
+    }
+  }
+
+  --animate-bounce-slow: bounce-slow 3s infinite;
+
+  @keyframes bounce-slow {
+
+    0%,
+    100% {
+      transform: translateY(-5%);
+      animation-timing-function: ease-in-out;
+    }
+
+    50% {
+      transform: translateY(5%);
+      animation-timing-function: ease-in-out;
     }
   }
 }

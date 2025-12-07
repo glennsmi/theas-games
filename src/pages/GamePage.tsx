@@ -169,7 +169,7 @@ export default function GamePage() {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[80vh] space-y-8 animate-in fade-in duration-700 pb-12">
+    <div className="container mx-auto px-4 py-8 flex flex-col items-center justify-center min-h-[80vh] space-y-8 animate-in fade-in duration-700 pb-12">
       <div className="text-center space-y-6 w-full max-w-4xl">
         <div className="flex flex-col md:flex-row items-center justify-between gap-4">
           <h1 className="text-4xl font-bold text-dark-navy drop-shadow-sm">
@@ -276,6 +276,18 @@ export default function GamePage() {
           <div className="bg-white p-8 rounded-2xl shadow-2xl text-center space-y-6 max-w-md mx-4 border-4 border-light-teal">
             <h2 className="text-4xl font-bold text-medium-purple">Splendid! 🎉</h2>
             <p className="text-xl text-dark-navy">You found all the pairs in {moves} moves!</p>
+
+            {!auth.currentUser && gameMode === 'practice' && (
+              <div className="bg-pale-aqua/30 p-4 rounded-xl border border-medium-teal/20">
+                <p className="text-dark-navy mb-3 text-sm">
+                  Sign up for a free account to save your pearls and track your progress!
+                </p>
+                <Button variant="secondary" className="w-full bg-medium-purple hover:bg-deep-purple text-white">
+                  Create Free Account
+                </Button>
+              </div>
+            )}
+
             <Button size="lg" onClick={() => startNewGame(level, gameMode)} className="bg-medium-teal hover:bg-light-teal text-white w-full text-lg py-6 rounded-xl shadow-lg">
               Play Again
             </Button>

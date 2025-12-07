@@ -3,14 +3,20 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Link } from 'react-router-dom'
 
 
-export default function HomePage() {
+import { User } from 'firebase/auth'
+
+interface HomePageProps {
+  user: User | null
+}
+
+export default function HomePage({ user }: HomePageProps) {
   return (
-    <div className="flex flex-col items-center justify-center min-h-[80vh] space-y-12">
+    <div className="container mx-auto px-4 py-8 flex flex-col items-center justify-center min-h-[80vh] space-y-12">
       {/* Hero Section */}
       <div className="text-center space-y-6 max-w-3xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-1000">
         <div className="relative mx-auto w-64 h-64 md:w-80 md:h-80 mb-8">
           <img
-            src="/Theas_games_logo_500x500.png"
+            src="/theas-games-logo-transparent.png"
             alt="Thea's Games Logo"
             className="w-full h-full object-contain drop-shadow-xl hover:scale-105 transition-transform duration-300"
           />
@@ -30,9 +36,13 @@ export default function HomePage() {
               Play Now
             </Button>
           </Link>
-          <Button variant="secondary" size="lg" className="text-lg px-8 py-6 rounded-full shadow-md hover:shadow-lg transition-all bg-medium-purple hover:bg-deep-purple text-white">
-            Create Account
-          </Button>
+          {!user && (
+            <Link to="/auth">
+              <Button variant="secondary" size="lg" className="text-lg px-8 py-6 rounded-full shadow-md hover:shadow-lg transition-all bg-medium-purple hover:bg-deep-purple text-white">
+                Create Account
+              </Button>
+            </Link>
+          )}
         </div>
       </div>
 

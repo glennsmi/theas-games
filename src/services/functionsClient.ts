@@ -6,15 +6,15 @@ import type { User, CreateUser, UpdateUser, PaginationParams } from '@shared/sch
 
 // Initialize Firebase app
 const app = (() => {
-  try { 
-    return getApp() 
-  } catch { 
-    return initializeApp(firebaseConfig) 
+  try {
+    return getApp()
+  } catch {
+    return initializeApp(firebaseConfig)
   }
 })()
 
 // Initialize Functions with emulator connection
-let functionsInstance: Functions
+
 
 // Track if emulator connection has been attempted
 let emulatorConnected = false
@@ -46,7 +46,7 @@ function initializeFunctions(): Functions {
 }
 
 // Initialize functions instance
-functionsInstance = initializeFunctions()
+const functionsInstance = initializeFunctions()
 
 export async function callHelloWorld(): Promise<ApiResponse<{ message: string }>> {
   const fn = httpsCallable(functionsInstance, 'helloWorld')

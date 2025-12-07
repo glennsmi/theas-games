@@ -2,10 +2,10 @@ import { onRequest, onCall } from 'firebase-functions/v2/https';
 import { setGlobalOptions } from 'firebase-functions/v2';
 import * as admin from 'firebase-admin';
 import cors from 'cors';
-import { 
-  createSuccessResponse, 
-  createErrorResponse, 
-  User, 
+import {
+  createSuccessResponse,
+  createErrorResponse,
+  User,
   userSchema,
   paginationSchema,
   COLLECTIONS,
@@ -26,7 +26,7 @@ const db = admin.firestore();
 const corsHandler = cors({ origin: true });
 
 // Helper function to convert Firestore timestamp to Date
-const convertTimestamps = (data: any, id: string): User => {
+const convertTimestamps = (data: admin.firestore.DocumentData, id: string): User => {
   return {
     id,
     email: data.email,
@@ -42,7 +42,7 @@ export const helloWorld = onRequest((request, response) => {
     try {
       const message = 'Hello from Firebase Functions v2 in Europe West 2!';
       const apiResponse = createSuccessResponse({ message }, 'Function executed successfully');
-      
+
       response.json(apiResponse);
     } catch (error) {
       const errorResponse = createErrorResponse(
@@ -59,7 +59,7 @@ export const getUsers = onCall(async (request) => {
   try {
     // Validate pagination parameters
     const paginationResult = paginationSchema.safeParse(request.data);
-    
+
     if (!paginationResult.success) {
       return createErrorResponse('Invalid pagination parameters', paginationResult.error.message);
     }
@@ -85,7 +85,7 @@ export const getUsers = onCall(async (request) => {
     const total = totalSnapshot.data().count;
 
     const response = createSuccessResponse(users, 'Users retrieved successfully');
-    
+
     return {
       ...response,
       pagination: {
@@ -113,7 +113,7 @@ export const createUser = onCall(async (request) => {
 
     // Validate the user data using Zod schema
     const userData = userSchema.omit({ id: true, createdAt: true, updatedAt: true }).parse(request.data);
-    
+
     const now = admin.firestore.FieldValue.serverTimestamp();
     const newUserData = {
       email: userData.email,
@@ -144,7 +144,7 @@ export const getCurrentUser = onCall(async (request) => {
     }
 
     const userDoc = await db.collection(COLLECTIONS.USERS).doc(request.auth.uid).get();
-    
+
     if (!userDoc.exists) {
       return createErrorResponse('User not found', 'User profile does not exist');
     }
@@ -169,14 +169,14 @@ export const updateUser = onCall(async (request) => {
     }
 
     const updateData = userSchema.omit({ id: true, createdAt: true, updatedAt: true, email: true }).parse(request.data);
-    
+
     const updatePayload = {
       ...updateData,
       updatedAt: admin.firestore.FieldValue.serverTimestamp(),
     };
 
     await db.collection(COLLECTIONS.USERS).doc(request.auth.uid).update(updatePayload);
-    
+
     // Get updated user
     const userDoc = await db.collection(COLLECTIONS.USERS).doc(request.auth.uid).get();
     const userData = userDoc.data() as FirestoreUser;
