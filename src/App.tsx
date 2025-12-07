@@ -5,6 +5,7 @@ import { auth } from './config/firebase'
 
 import HomePage from './pages/HomePage.tsx'
 import GamePage from './pages/GamePage.tsx'
+import OceanDashPage from './pages/OceanDashPage.tsx'
 import AboutPage from './pages/AboutPage.tsx'
 import AuthPage from './pages/AuthPage.tsx'
 import ProfilePage from './pages/ProfilePage.tsx'
@@ -42,6 +43,7 @@ function App() {
           <Routes>
             <Route path="/" element={<HomePage user={user} />} />
             <Route path="/game" element={<GamePage />} />
+            <Route path="/ocean-dash" element={<OceanDashPage />} />
             <Route path="/about" element={<AboutPage />} />
             <Route path="/auth" element={<AuthPage />} />
             <Route path="/profile" element={<ProfilePage />} />
