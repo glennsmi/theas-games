@@ -1,15 +1,30 @@
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Link } from 'react-router-dom'
-
-
+import { Lock } from 'lucide-react'
 import { User } from 'firebase/auth'
+import { useEffect, useState } from 'react'
+import { getUserSubscription, isPremiumSubscription } from '@/services/subscriptionService'
 
 interface HomePageProps {
   user: User | null
 }
 
 export default function HomePage({ user }: HomePageProps) {
+  const [isPremium, setIsPremium] = useState(false)
+
+  useEffect(() => {
+    const checkSubscription = async () => {
+      if (user) {
+        const subscription = await getUserSubscription(user.uid)
+        setIsPremium(isPremiumSubscription(subscription))
+      } else {
+        setIsPremium(false)
+      }
+    }
+    checkSubscription()
+  }, [user])
+
   return (
     <div className="container mx-auto px-4 py-8 flex flex-col items-center justify-center min-h-[80vh] space-y-12">
       {/* Hero Section */}
@@ -96,11 +111,17 @@ export default function HomePage({ user }: HomePageProps) {
             </CardFooter>
           </Card>
 
-          {/* Pollution Patrol Card */}
-          <Card className="bg-white/90 backdrop-blur-sm border-2 border-pale-aqua hover:border-medium-teal transition-all duration-300 hover:shadow-xl transform hover:-translate-y-1 group">
+          {/* Pollution Patrol Card - PREMIUM */}
+          <Card className={`bg-white/90 backdrop-blur-sm border-2 transition-all duration-300 hover:shadow-xl transform hover:-translate-y-1 group relative overflow-hidden ${isPremium ? 'border-pale-aqua hover:border-medium-teal' : 'border-medium-purple/50'}`}>
+            {!isPremium && (
+              <div className="absolute top-2 right-2 bg-medium-purple text-white text-xs px-2 py-1 rounded-full font-bold flex items-center gap-1">
+                <Lock className="w-3 h-3" />
+                Premium
+              </div>
+            )}
             <CardHeader className="pb-2">
               <div className="text-4xl mb-2">♻️</div>
-              <CardTitle className="text-xl text-dark-navy group-hover:text-medium-teal transition-colors">Pollution Patrol</CardTitle>
+              <CardTitle className={`text-xl text-dark-navy transition-colors ${isPremium ? 'group-hover:text-medium-teal' : 'group-hover:text-medium-purple'}`}>Pollution Patrol</CardTitle>
               <CardDescription className="text-medium-purple font-medium text-sm">Ocean Cleanup Mission</CardDescription>
             </CardHeader>
             <CardContent className="pb-4">
@@ -109,19 +130,34 @@ export default function HomePage({ user }: HomePageProps) {
               </p>
             </CardContent>
             <CardFooter>
-              <Link to="/pollution-patrol" className="w-full">
-                <Button variant="outline" className="w-full border-medium-teal text-medium-teal hover:bg-medium-teal hover:text-white">
-                  Play
-                </Button>
-              </Link>
+              {isPremium ? (
+                <Link to="/pollution-patrol" className="w-full">
+                  <Button variant="outline" className="w-full border-medium-teal text-medium-teal hover:bg-medium-teal hover:text-white">
+                    Play
+                  </Button>
+                </Link>
+              ) : (
+                <Link to="/subscription" className="w-full">
+                  <Button variant="outline" className="w-full border-medium-purple text-medium-purple hover:bg-medium-purple hover:text-white">
+                    <Lock className="w-4 h-4 mr-2" />
+                    Unlock
+                  </Button>
+                </Link>
+              )}
             </CardFooter>
           </Card>
 
-          {/* Character Creator Card */}
-          <Card className="bg-white/90 backdrop-blur-sm border-2 border-pale-aqua hover:border-medium-teal transition-all duration-300 hover:shadow-xl transform hover:-translate-y-1 group">
+          {/* Character Creator Card - PREMIUM */}
+          <Card className={`bg-white/90 backdrop-blur-sm border-2 transition-all duration-300 hover:shadow-xl transform hover:-translate-y-1 group relative overflow-hidden ${isPremium ? 'border-pale-aqua hover:border-medium-teal' : 'border-medium-purple/50'}`}>
+            {!isPremium && (
+              <div className="absolute top-2 right-2 bg-medium-purple text-white text-xs px-2 py-1 rounded-full font-bold flex items-center gap-1">
+                <Lock className="w-3 h-3" />
+                Premium
+              </div>
+            )}
             <CardHeader className="pb-2">
               <div className="text-4xl mb-2">🎨</div>
-              <CardTitle className="text-xl text-dark-navy group-hover:text-medium-teal transition-colors">Character Creator</CardTitle>
+              <CardTitle className={`text-xl text-dark-navy transition-colors ${isPremium ? 'group-hover:text-medium-teal' : 'group-hover:text-medium-purple'}`}>Character Creator</CardTitle>
               <CardDescription className="text-medium-purple font-medium text-sm">Design Your Hero</CardDescription>
             </CardHeader>
             <CardContent className="pb-4">
@@ -130,11 +166,20 @@ export default function HomePage({ user }: HomePageProps) {
               </p>
             </CardContent>
             <CardFooter>
-              <Link to="/character-creation" className="w-full">
-                <Button variant="outline" className="w-full border-medium-teal text-medium-teal hover:bg-medium-teal hover:text-white">
-                  Customize
-                </Button>
-              </Link>
+              {isPremium ? (
+                <Link to="/character-creation" className="w-full">
+                  <Button variant="outline" className="w-full border-medium-teal text-medium-teal hover:bg-medium-teal hover:text-white">
+                    Customize
+                  </Button>
+                </Link>
+              ) : (
+                <Link to="/subscription" className="w-full">
+                  <Button variant="outline" className="w-full border-medium-purple text-medium-purple hover:bg-medium-purple hover:text-white">
+                    <Lock className="w-4 h-4 mr-2" />
+                    Unlock
+                  </Button>
+                </Link>
+              )}
             </CardFooter>
           </Card>
         </div>

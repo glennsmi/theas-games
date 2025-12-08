@@ -11,7 +11,7 @@ export const childProfileSchema = z.object({
   // Game progress could be stored here or in a separate collection, 
   // but for simple stats, we can keep it here.
   totalStars: z.number().default(0),
-  unlockedGames: z.array(z.string()).default(['simple-match', 'ocean-dash', 'pollution-patrol']),
+  unlockedGames: z.array(z.string()).default(['simple-match', 'ocean-dash']),
 });
 
 export const createChildProfileSchema = z.object({

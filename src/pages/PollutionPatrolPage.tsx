@@ -5,8 +5,9 @@ import { createGameConfig, Difficulty, DIFFICULTY_CONFIG } from '@/games/platfor
 import { Button } from '@/components/ui/button'
 import { auth } from '@/config/firebase'
 import { updateUserPearls } from '@/services/userService'
-import { getChildren } from '@/services/parentService'
+import { getUserSubscription, isPremiumSubscription } from '@/services/subscriptionService'
 import { cn } from '@/lib/utils'
+import { Lock, Loader2 } from 'lucide-react'
 
 // Check if device supports native fullscreen API
 const supportsNativeFullscreen = () => {
@@ -32,8 +33,30 @@ export default function PollutionPatrolPage() {
   const [showInfo, setShowInfo] = useState(false)
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [isPseudoFullscreen, setIsPseudoFullscreen] = useState(false)
+  const [checkingAccess, setCheckingAccess] = useState(true)
+  const [hasAccess, setHasAccess] = useState(false)
   
   const { activeChild } = useChild()
+  
+  // Check premium access
+  useEffect(() => {
+    const checkAccess = async () => {
+      const user = auth.currentUser
+      if (!user) {
+        navigate('/subscription')
+        return
+      }
+      
+      const subscription = await getUserSubscription(user.uid)
+      if (isPremiumSubscription(subscription)) {
+        setHasAccess(true)
+      } else {
+        navigate('/subscription')
+      }
+      setCheckingAccess(false)
+    }
+    checkAccess()
+  }, [navigate])
   
   // Parse avatar config from active child
   const avatarConfig = activeChild?.avatarConfig 
@@ -144,6 +167,30 @@ export default function PollutionPatrolPage() {
   }
 
   const gameConfig = createGameConfig(handleGameOver, difficulty, avatarConfig)
+
+  // Loading state while checking access
+  if (checkingAccess) {
+    return (
+      <div className="min-h-[calc(100vh-80px)] flex flex-col items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-medium-teal" />
+        <p className="mt-4 text-dark-navy/70">Checking access...</p>
+      </div>
+    )
+  }
+
+  // If no access (shouldn't happen as we redirect, but safety check)
+  if (!hasAccess) {
+    return (
+      <div className="min-h-[calc(100vh-80px)] flex flex-col items-center justify-center">
+        <Lock className="w-16 h-16 text-medium-purple mb-4" />
+        <h2 className="text-2xl font-bold text-dark-navy mb-2">Premium Content</h2>
+        <p className="text-dark-navy/70 mb-6">Subscribe to unlock Pollution Patrol!</p>
+        <Button onClick={() => navigate('/subscription')} className="bg-medium-purple hover:bg-deep-purple">
+          View Plans
+        </Button>
+      </div>
+    )
+  }
 
   // Pseudo-fullscreen layout
   if (isPseudoFullscreen) {

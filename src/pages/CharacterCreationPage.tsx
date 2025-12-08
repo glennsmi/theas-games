@@ -1,10 +1,11 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { auth } from '@/config/firebase'
-import { getChildren, updateChild } from '@/services/parentService'
+import { updateChild } from '@/services/parentService'
+import { getUserSubscription, isPremiumSubscription } from '@/services/subscriptionService'
 import { ChildProfile } from '@shared/schemas/child'
 import { Button } from '@/components/ui/button'
-import { Loader2, ArrowLeft, Check, Save, User } from 'lucide-react'
+import { Loader2, ArrowLeft, Check, Save, User, Lock } from 'lucide-react'
 import { toast } from 'sonner'
 import { useChild } from '@/context/ChildContext'
 
@@ -21,8 +22,9 @@ const CHARACTER_COLORS = [
 
 export default function CharacterCreationPage() {
   const navigate = useNavigate()
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [hasAccess, setHasAccess] = useState(false)
   const { childrenProfiles, activeChildId, setActiveChildId, refreshChildren } = useChild()
   
   const [selectedChildId, setSelectedChildId] = useState<string | null>(activeChildId)
@@ -33,10 +35,28 @@ export default function CharacterCreationPage() {
   // Canvas ref for preview
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
+  // Check premium access
+  useEffect(() => {
+    const checkAccess = async () => {
+      if (!auth.currentUser) {
+        navigate('/subscription')
+        return
+      }
+      
+      const subscription = await getUserSubscription(auth.currentUser.uid)
+      if (isPremiumSubscription(subscription)) {
+        setHasAccess(true)
+        setLoading(false)
+      } else {
+        navigate('/subscription')
+      }
+    }
+    checkAccess()
+  }, [navigate])
+
   // Load config whenever selected child or profiles change
   useEffect(() => {
-    if (!auth.currentUser) {
-      navigate('/auth')
+    if (!auth.currentUser || !hasAccess) {
       return
     }
 
@@ -55,7 +75,7 @@ export default function CharacterCreationPage() {
        setSelectedChildId(firstChild.id)
        loadChildConfig(firstChild)
     }
-  }, [navigate, activeChildId, childrenProfiles])
+  }, [navigate, activeChildId, childrenProfiles, hasAccess])
 
   const loadChildConfig = (child: ChildProfile) => {
     let colorToSet = CHARACTER_COLORS[0] // Default to Original
@@ -161,8 +181,23 @@ export default function CharacterCreationPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-sky-50">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-sky-50">
         <Loader2 className="w-8 h-8 animate-spin text-[#40B5A8]" />
+        <p className="mt-4 text-slate-600">Checking access...</p>
+      </div>
+    )
+  }
+
+  // If no access (shouldn't happen as we redirect, but safety check)
+  if (!hasAccess) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-sky-50">
+        <Lock className="w-16 h-16 text-medium-purple mb-4" />
+        <h2 className="text-2xl font-bold text-slate-800 mb-2">Premium Feature</h2>
+        <p className="text-slate-600 mb-6">Subscribe to unlock Character Creator!</p>
+        <Button onClick={() => navigate('/subscription')} className="bg-medium-purple hover:bg-deep-purple">
+          View Plans
+        </Button>
       </div>
     )
   }
