@@ -13,6 +13,35 @@ export interface CookieConsent {
 const COOKIE_CONSENT_KEY = 'theas_games_cookie_consent'
 const COOKIE_CONSENT_VERSION = '1.0'
 
+// Callback type for consent changes
+type ConsentChangeCallback = (consent: CookieConsent) => void
+
+// Store consent change listeners
+const consentChangeListeners: ConsentChangeCallback[] = []
+
+// Register a callback for consent changes
+export function onConsentChange(callback: ConsentChangeCallback): () => void {
+  consentChangeListeners.push(callback)
+  // Return unsubscribe function
+  return () => {
+    const index = consentChangeListeners.indexOf(callback)
+    if (index > -1) {
+      consentChangeListeners.splice(index, 1)
+    }
+  }
+}
+
+// Notify all listeners of consent change
+function notifyConsentChange(consent: CookieConsent): void {
+  consentChangeListeners.forEach(callback => {
+    try {
+      callback(consent)
+    } catch (error) {
+      console.error('Error in consent change callback:', error)
+    }
+  })
+}
+
 // Default consent state
 export const defaultConsent: CookieConsent = {
   essential: true,
@@ -44,6 +73,8 @@ export function getLocalConsent(): CookieConsent | null {
 export function saveLocalConsent(consent: CookieConsent): void {
   try {
     localStorage.setItem(COOKIE_CONSENT_KEY, JSON.stringify(consent))
+    // Notify listeners of the change
+    notifyConsentChange(consent)
   } catch (error) {
     console.error('Error saving cookie consent to localStorage:', error)
   }

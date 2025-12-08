@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
@@ -6,6 +6,7 @@ import { ShellCard } from '@/components/game/ShellCard'
 import confetti from 'canvas-confetti'
 import { auth } from '@/config/firebase'
 import { updateUserPearls } from '@/services/userService'
+import { trackGameStarted, trackGameEnded, trackDifficultyChanged } from '@/services/analyticsService'
 
 // Game Configuration
 const LEVELS = {
@@ -40,6 +41,10 @@ export default function GamePage() {
   const [currentStreak, setCurrentStreak] = useState<number>(0)
   const [showStreakBanner, setShowStreakBanner] = useState<boolean>(false)
   const [bestStreak, setBestStreak] = useState<number>(0)
+  
+  // Analytics tracking
+  const gameStartTimeRef = useRef<number>(Date.now())
+  const previousLevelRef = useRef<'easy' | 'medium' | 'hard'>(level)
 
   // Initialize Game
   useEffect(() => {
@@ -47,6 +52,12 @@ export default function GamePage() {
   }, [level, gameMode])
 
   const startNewGame = (selectedLevel: 'easy' | 'medium' | 'hard', mode: 'practice' | 'multiplayer') => {
+    // Track difficulty change if level changed
+    if (previousLevelRef.current !== selectedLevel) {
+      trackDifficultyChanged('simple_match', previousLevelRef.current, selectedLevel)
+      previousLevelRef.current = selectedLevel
+    }
+    
     const config = LEVELS[selectedLevel]
     const selectedEmojis = EMOJIS.slice(0, config.pairs)
     const gameCards = [...selectedEmojis, ...selectedEmojis]
@@ -68,6 +79,13 @@ export default function GamePage() {
     setCurrentStreak(0)
     setBestStreak(0)
     setShowStreakBanner(false)
+    
+    // Track game start
+    gameStartTimeRef.current = Date.now()
+    trackGameStarted({
+      game_name: 'simple_match',
+      difficulty: selectedLevel,
+    })
 
     // Use mode to suppress lint if needed, or just for logic
     console.log(`Starting new game: ${selectedLevel} - ${mode}`)
@@ -257,6 +275,17 @@ export default function GamePage() {
           const newPairs = prev + 1
           if (newPairs === LEVELS[level].pairs) {
             setGameWon(true)
+            
+            // Track game end
+            const durationSeconds = Math.round((Date.now() - gameStartTimeRef.current) / 1000)
+            trackGameEnded({
+              game_name: 'simple_match',
+              difficulty: level,
+              score: scores[1] + 1, // Include current match
+              pearls: scores[1] + 1,
+              duration_seconds: durationSeconds,
+            })
+            
             setTimeout(() => {
               // Epic win celebration!
               fireStreakCannons(Math.max(newStreak, 3))

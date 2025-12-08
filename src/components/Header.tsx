@@ -34,10 +34,10 @@ export default function Header({ user }: HeaderProps) {
               About
             </Link>
             <Link
-              to="/game"
+              to="/helping-the-environment"
               className="text-dark-navy hover:text-medium-teal px-3 py-2 text-md font-medium transition-colors"
             >
-              Games
+              Helping The Environment
             </Link>
           </nav>
 

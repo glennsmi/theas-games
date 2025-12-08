@@ -5,8 +5,13 @@ import { createGameConfig, Difficulty, DIFFICULTY_CONFIG } from '@/games/ocean-d
 import { Button } from '@/components/ui/button'
 import { auth } from '@/config/firebase'
 import { updateUserPearls } from '@/services/userService'
-import { getChildren } from '@/services/parentService'
 import { cn } from '@/lib/utils'
+import {
+  trackGameStarted,
+  trackGameEnded,
+  trackDifficultyChanged,
+  trackFullscreenToggled,
+} from '@/services/analyticsService'
 
 // Check if device supports native fullscreen API
 const supportsNativeFullscreen = () => {
@@ -32,8 +37,19 @@ export default function OceanDashPage() {
   const [showInfo, setShowInfo] = useState(false)
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [isPseudoFullscreen, setIsPseudoFullscreen] = useState(false) // For iOS fallback
+  const [gameStartTime, setGameStartTime] = useState<number | null>(null)
   
   const { activeChild } = useChild()
+
+  // Track game start when component mounts or game restarts
+  useEffect(() => {
+    trackGameStarted({
+      game_name: 'ocean_dash',
+      difficulty,
+      child_id: activeChild?.id,
+    })
+    setGameStartTime(Date.now())
+  }, [gameKey]) // Track on initial mount and when game restarts
   
   // Parse avatar config from active child
   const avatarConfig = activeChild?.avatarConfig 
@@ -98,7 +114,9 @@ export default function OceanDashPage() {
     // Check if we should use pseudo-fullscreen (iOS or no native support)
     if (isIOS() || !supportsNativeFullscreen()) {
       // Use CSS-based pseudo-fullscreen
-      setIsPseudoFullscreen(prev => !prev)
+      const newState = !isPseudoFullscreen
+      setIsPseudoFullscreen(newState)
+      trackFullscreenToggled('ocean_dash', newState)
       return
     }
     
@@ -111,24 +129,31 @@ export default function OceanDashPage() {
         // Enter fullscreen
         if (elem?.requestFullscreen) {
           await elem.requestFullscreen()
+          trackFullscreenToggled('ocean_dash', true)
         } else if (elem?.webkitRequestFullscreen) {
           await elem.webkitRequestFullscreen()
+          trackFullscreenToggled('ocean_dash', true)
         } else {
           // Fallback to pseudo-fullscreen
           setIsPseudoFullscreen(true)
+          trackFullscreenToggled('ocean_dash', true)
         }
       } else {
         // Exit fullscreen
         if (document.exitFullscreen) {
           await document.exitFullscreen()
+          trackFullscreenToggled('ocean_dash', false)
         } else if (doc.webkitExitFullscreen) {
           await doc.webkitExitFullscreen()
+          trackFullscreenToggled('ocean_dash', false)
         }
       }
     } catch (error) {
       console.error('Fullscreen error:', error)
       // Fallback to pseudo-fullscreen on error
-      setIsPseudoFullscreen(prev => !prev)
+      const newState = !isPseudoFullscreen
+      setIsPseudoFullscreen(newState)
+      trackFullscreenToggled('ocean_dash', newState)
     }
   }
 
@@ -137,6 +162,21 @@ export default function OceanDashPage() {
 
   const handleGameOver = useCallback(async (distance: number, pearls: number) => {
     setLastScore({ distance, pearls })
+    
+    // Calculate game duration
+    const durationSeconds = gameStartTime 
+      ? Math.round((Date.now() - gameStartTime) / 1000)
+      : undefined
+    
+    // Track game end
+    trackGameEnded({
+      game_name: 'ocean_dash',
+      difficulty,
+      distance,
+      pearls,
+      duration_seconds: durationSeconds,
+      child_id: activeChild?.id,
+    })
     
     // Save pearls to user account
     const user = auth.currentUser
@@ -147,9 +187,11 @@ export default function OceanDashPage() {
         console.error('Failed to save pearls:', error)
       }
     }
-  }, [])
+  }, [difficulty, gameStartTime, activeChild?.id])
 
   const handleDifficultyChange = (newDifficulty: Difficulty) => {
+    // Track difficulty change
+    trackDifficultyChanged('ocean_dash', difficulty, newDifficulty)
     setDifficulty(newDifficulty)
     setGameKey(prev => prev + 1) // Force game restart
   }

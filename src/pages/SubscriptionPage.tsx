@@ -1,10 +1,15 @@
-import React from 'react';
+import { useEffect } from 'react';
 import { auth } from '../config/firebase';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { ParallaxLayer } from '@/components/layout/ParallaxLayout';
+import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { trackSubscriptionPageViewed } from '@/services/analyticsService';
 
 export default function SubscriptionPage() {
   const user = auth.currentUser;
+  
+  // Track subscription page view
+  useEffect(() => {
+    trackSubscriptionPageViewed(!!user)
+  }, [user])
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-5xl">

@@ -5,12 +5,10 @@ import {
   getDocs, 
   addDoc, 
   updateDoc, 
-  deleteDoc, 
-  query, 
-  where,
+  deleteDoc,
   serverTimestamp 
 } from 'firebase/firestore';
-import { COLLECTIONS, ChildProfile, CreateChildProfile, UpdateChildProfile } from '@shared/index'; // Assuming alias is set up or relative path
+import { ChildProfile, CreateChildProfile, UpdateChildProfile } from '@shared/index';
 // Note: if @shared alias isn't working, I'll fix imports. For now using relative path in next write if needed.
 
 const USERS_COLLECTION = 'users';

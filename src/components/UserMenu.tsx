@@ -6,7 +6,7 @@ import { LogOut, Settings, ChevronDown, Users, Shield, User as UserIcon, CreditC
 import { Button } from '@/components/ui/button'
 import UserAvatar from './UserAvatar'
 import { useChild } from '@/context/ChildContext'
-import { getStripeBillingPortalUrl } from '@/services/subscriptionService'
+import { getStripeBillingPortalUrl, getUserSubscription, isPremiumSubscription } from '@/services/subscriptionService'
 import Avatar from 'react-nice-avatar'
 
 interface UserMenuProps {
@@ -15,9 +15,21 @@ interface UserMenuProps {
 
 export default function UserMenu({ user }: UserMenuProps) {
   const [isOpen, setIsOpen] = useState(false)
+  const [isPremium, setIsPremium] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
   const navigate = useNavigate()
   const { childrenProfiles, activeChild, setActiveChildId } = useChild()
+
+  // Check subscription status
+  useEffect(() => {
+    const checkSubscription = async () => {
+      if (user) {
+        const subscription = await getUserSubscription(user.uid)
+        setIsPremium(isPremiumSubscription(subscription))
+      }
+    }
+    checkSubscription()
+  }, [user])
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -140,13 +152,15 @@ export default function UserMenu({ user }: UserMenuProps) {
               <Shield className="h-4 w-4" />
               Subscription
             </Link>
-            <button
-              onClick={handleOpenBillingPortal}
-              className="flex items-center gap-2 w-full px-3 py-2 text-sm text-dark-navy hover:bg-light-teal/10 rounded-md transition-colors"
-            >
-              <CreditCard className="h-4 w-4" />
-              Manage Billing
-            </button>
+            {isPremium && (
+              <button
+                onClick={handleOpenBillingPortal}
+                className="flex items-center gap-2 w-full px-3 py-2 text-sm text-dark-navy hover:bg-light-teal/10 rounded-md transition-colors"
+              >
+                <CreditCard className="h-4 w-4" />
+                Manage Billing
+              </button>
+            )}
             <Link
               to="/profile"
               className="flex items-center gap-2 w-full px-3 py-2 text-sm text-dark-navy hover:bg-light-teal/10 rounded-md transition-colors"

@@ -8,6 +8,13 @@ import { updateUserPearls } from '@/services/userService'
 import { getUserSubscription, isPremiumSubscription } from '@/services/subscriptionService'
 import { cn } from '@/lib/utils'
 import { Lock, Loader2 } from 'lucide-react'
+import {
+  trackGameStarted,
+  trackGameEnded,
+  trackDifficultyChanged,
+  trackFullscreenToggled,
+  trackPremiumContentBlocked,
+} from '@/services/analyticsService'
 
 // Check if device supports native fullscreen API
 const supportsNativeFullscreen = () => {
@@ -35,6 +42,7 @@ export default function PollutionPatrolPage() {
   const [isPseudoFullscreen, setIsPseudoFullscreen] = useState(false)
   const [checkingAccess, setCheckingAccess] = useState(true)
   const [hasAccess, setHasAccess] = useState(false)
+  const [gameStartTime, setGameStartTime] = useState<number | null>(null)
   
   const { activeChild } = useChild()
   
@@ -43,6 +51,7 @@ export default function PollutionPatrolPage() {
     const checkAccess = async () => {
       const user = auth.currentUser
       if (!user) {
+        trackPremiumContentBlocked('pollution_patrol', '/pollution-patrol')
         navigate('/subscription')
         return
       }
@@ -51,6 +60,7 @@ export default function PollutionPatrolPage() {
       if (isPremiumSubscription(subscription)) {
         setHasAccess(true)
       } else {
+        trackPremiumContentBlocked('pollution_patrol', '/pollution-patrol')
         navigate('/subscription')
       }
       setCheckingAccess(false)
@@ -73,6 +83,18 @@ export default function PollutionPatrolPage() {
   useEffect(() => {
     setGameKey(prev => prev + 1)
   }, [activeChild?.id, activeChild?.avatarConfig])
+
+  // Track game start when hasAccess and game restarts
+  useEffect(() => {
+    if (hasAccess) {
+      trackGameStarted({
+        game_name: 'pollution_patrol',
+        difficulty,
+        child_id: activeChild?.id,
+      })
+      setGameStartTime(Date.now())
+    }
+  }, [gameKey, hasAccess]) // Track on game restart
 
   // Listen for native fullscreen changes
   useEffect(() => {
@@ -116,7 +138,9 @@ export default function PollutionPatrolPage() {
 
   const toggleFullscreen = async () => {
     if (isIOS() || !supportsNativeFullscreen()) {
-      setIsPseudoFullscreen(prev => !prev)
+      const newState = !isPseudoFullscreen
+      setIsPseudoFullscreen(newState)
+      trackFullscreenToggled('pollution_patrol', newState)
       return
     }
     
@@ -127,21 +151,28 @@ export default function PollutionPatrolPage() {
       if (!document.fullscreenElement && !doc.webkitFullscreenElement) {
         if (elem?.requestFullscreen) {
           await elem.requestFullscreen()
+          trackFullscreenToggled('pollution_patrol', true)
         } else if (elem?.webkitRequestFullscreen) {
           await elem.webkitRequestFullscreen()
+          trackFullscreenToggled('pollution_patrol', true)
         } else {
           setIsPseudoFullscreen(true)
+          trackFullscreenToggled('pollution_patrol', true)
         }
       } else {
         if (document.exitFullscreen) {
           await document.exitFullscreen()
+          trackFullscreenToggled('pollution_patrol', false)
         } else if (doc.webkitExitFullscreen) {
           await doc.webkitExitFullscreen()
+          trackFullscreenToggled('pollution_patrol', false)
         }
       }
     } catch (error) {
       console.error('Fullscreen error:', error)
-      setIsPseudoFullscreen(prev => !prev)
+      const newState = !isPseudoFullscreen
+      setIsPseudoFullscreen(newState)
+      trackFullscreenToggled('pollution_patrol', newState)
     }
   }
 
@@ -149,6 +180,22 @@ export default function PollutionPatrolPage() {
 
   const handleGameOver = useCallback(async (score: number, pearls: number, babiesReunited: number) => {
     setLastScore({ score, pearls, babies: babiesReunited })
+    
+    // Calculate game duration
+    const durationSeconds = gameStartTime 
+      ? Math.round((Date.now() - gameStartTime) / 1000)
+      : undefined
+    
+    // Track game end
+    trackGameEnded({
+      game_name: 'pollution_patrol',
+      difficulty,
+      score,
+      pearls,
+      babies_reunited: babiesReunited,
+      duration_seconds: durationSeconds,
+      child_id: activeChild?.id,
+    })
     
     // Save pearls to user account
     const user = auth.currentUser
@@ -159,9 +206,10 @@ export default function PollutionPatrolPage() {
         console.error('Failed to save pearls:', error)
       }
     }
-  }, [])
+  }, [difficulty, gameStartTime, activeChild?.id])
 
   const handleDifficultyChange = (newDifficulty: Difficulty) => {
+    trackDifficultyChanged('pollution_patrol', difficulty, newDifficulty)
     setDifficulty(newDifficulty)
     setGameKey(prev => prev + 1)
   }

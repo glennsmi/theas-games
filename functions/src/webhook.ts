@@ -74,14 +74,19 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
 
   logger.info(`Checkout completed for user ${userId}`);
 
-  // We wait for the subscription updated event to handle the full sync, 
-  // but we can ensure the user has the customer ID linked immediately.
+  // Set subscription data immediately - checkout completion means active premium
+  // The subscription.updated event will provide more details, but this ensures
+  // the user has premium access right away
   await db.collection(COLLECTIONS.USERS).doc(userId).set({
     subscription: {
+      tier: 'premium',
+      status: 'active',
       stripeCustomerId: customerId,
       stripeSubscriptionId: subscriptionId,
     }
   }, { merge: true });
+
+  logger.info(`Set premium subscription for user ${userId}`);
 }
 
 async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {

@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import { User } from 'firebase/auth'
 import { auth } from './config/firebase'
@@ -26,7 +26,21 @@ import ScrollToTop from './components/ScrollToTop'
 import { ParallaxLayout } from './components/layout/ParallaxLayout'
 
 import { ChildProvider } from './context/ChildContext'
+import { AnalyticsConsentManager } from './providers/PostHogProvider'
+import { trackPageView } from './services/analyticsService'
 import { Toaster } from 'sonner'
+
+// Component to track page views
+function PageViewTracker() {
+  const location = useLocation()
+
+  useEffect(() => {
+    // Track page view on route change
+    trackPageView(location.pathname)
+  }, [location.pathname])
+
+  return null
+}
 
 function App() {
   const [user, setUser] = useState<User | null>(null)
@@ -52,36 +66,39 @@ function App() {
   }
 
   return (
-    <ChildProvider>
-      <Router>
-        <ScrollToTop />
-        <ParallaxLayout>
-          <Header user={user} />
-          <main className="flex-grow">
-            <Routes>
-              <Route path="/" element={<HomePage user={user} />} />
-              <Route path="/game" element={<GamePage />} />
-              <Route path="/ocean-dash" element={<OceanDashPage />} />
-              <Route path="/pollution-patrol" element={<PollutionPatrolPage />} />
-              <Route path="/about" element={<AboutPage />} />
-              <Route path="/auth" element={<AuthPage />} />
-              <Route path="/profile" element={<ProfilePage />} />
-              <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
-              <Route path="/cookie-policy" element={<CookiePolicyPage />} />
-              <Route path="/terms" element={<TermsPage />} />
-              <Route path="/ocean-pollution" element={<OceanPollutionPage />} />
-              <Route path="/parent-dashboard" element={<ParentDashboardPage />} />
-              <Route path="/subscription" element={<SubscriptionPage />} />
-              <Route path="/helping-the-environment" element={<HelpingTheEnvironmentPage />} />
-              <Route path="/character-creation" element={<CharacterCreationPage />} />
-            </Routes>
-          </main>
-          <Footer />
-          <CookieConsentBanner user={user} />
-          <Toaster />
-        </ParallaxLayout>
-      </Router>
-    </ChildProvider>
+    <AnalyticsConsentManager user={user}>
+      <ChildProvider>
+        <Router>
+          <ScrollToTop />
+          <PageViewTracker />
+          <ParallaxLayout>
+            <Header user={user} />
+            <main className="flex-grow">
+              <Routes>
+                <Route path="/" element={<HomePage user={user} />} />
+                <Route path="/game" element={<GamePage />} />
+                <Route path="/ocean-dash" element={<OceanDashPage />} />
+                <Route path="/pollution-patrol" element={<PollutionPatrolPage />} />
+                <Route path="/about" element={<AboutPage />} />
+                <Route path="/auth" element={<AuthPage />} />
+                <Route path="/profile" element={<ProfilePage />} />
+                <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+                <Route path="/cookie-policy" element={<CookiePolicyPage />} />
+                <Route path="/terms" element={<TermsPage />} />
+                <Route path="/ocean-pollution" element={<OceanPollutionPage />} />
+                <Route path="/parent-dashboard" element={<ParentDashboardPage />} />
+                <Route path="/subscription" element={<SubscriptionPage />} />
+                <Route path="/helping-the-environment" element={<HelpingTheEnvironmentPage />} />
+                <Route path="/character-creation" element={<CharacterCreationPage />} />
+              </Routes>
+            </main>
+            <Footer />
+            <CookieConsentBanner user={user} />
+            <Toaster />
+          </ParallaxLayout>
+        </Router>
+      </ChildProvider>
+    </AnalyticsConsentManager>
   )
 }
 

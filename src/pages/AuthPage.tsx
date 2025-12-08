@@ -14,6 +14,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Loader2, Mail } from 'lucide-react'
+import { trackSignUp, trackSignIn, identifyUser } from '@/services/analyticsService'
 
 export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(true)
@@ -37,8 +38,16 @@ export default function AuthPage() {
       if (emailForSignIn) {
         setLoading(true)
         signInWithEmailLink(auth, emailForSignIn, window.location.href)
-          .then(() => {
+          .then((result) => {
             window.localStorage.removeItem('emailForSignIn')
+            // Track sign in with magic link
+            trackSignIn('magic_link')
+            if (result.user) {
+              identifyUser(result.user.uid, {
+                email: result.user.email,
+                name: result.user.displayName,
+              })
+            }
             navigate('/')
           })
           .catch((error) => {
@@ -54,7 +63,22 @@ export default function AuthPage() {
     setError(null)
     try {
       const provider = new GoogleAuthProvider()
-      await signInWithPopup(auth, provider)
+      const result = await signInWithPopup(auth, provider)
+      
+      // Track based on whether this is a new user or returning user
+      const isNewUser = result.user.metadata.creationTime === result.user.metadata.lastSignInTime
+      if (isNewUser) {
+        trackSignUp('google')
+      } else {
+        trackSignIn('google')
+      }
+      
+      // Identify user for future events
+      identifyUser(result.user.uid, {
+        email: result.user.email,
+        name: result.user.displayName,
+      })
+      
       navigate('/')
     } catch (err: unknown) {
       if (err instanceof Error) {
@@ -73,9 +97,19 @@ export default function AuthPage() {
     setError(null)
     try {
       if (isLogin) {
-        await signInWithEmailAndPassword(auth, email, password)
+        const result = await signInWithEmailAndPassword(auth, email, password)
+        trackSignIn('email')
+        identifyUser(result.user.uid, {
+          email: result.user.email,
+          name: result.user.displayName,
+        })
       } else {
-        await createUserWithEmailAndPassword(auth, email, password)
+        const result = await createUserWithEmailAndPassword(auth, email, password)
+        trackSignUp('email')
+        identifyUser(result.user.uid, {
+          email: result.user.email,
+          name: result.user.displayName,
+        })
       }
       navigate('/')
     } catch (err: unknown) {

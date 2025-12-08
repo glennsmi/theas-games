@@ -1,5 +1,3 @@
-import React from 'react'
-
 const CarbonContributionPage = () => {
   return (
     <div className="bg-white min-h-screen font-sans text-dark-navy">

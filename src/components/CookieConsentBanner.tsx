@@ -7,7 +7,6 @@ import {
   acceptAndSyncConsent,
   saveAndSyncCustomConsent,
   getLocalConsent,
-  CookieConsent,
 } from '@/services/cookieConsentService'
 
 interface CookieConsentBannerProps {
