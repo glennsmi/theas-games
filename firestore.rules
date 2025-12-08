@@ -1,18 +1,39 @@
-rules_version='2'
+rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /{document=**} {
-      // This rule allows anyone with your database reference to view, edit,
-      // and delete all data in your database. It is useful for getting
-      // started, but it is configured to expire after 30 days because it
-      // leaves your app open to attackers. At that time, all client
-      // requests to your database will be denied.
-      //
-      // Make sure to write security rules for your app before that time, or
-      // else all client requests to your database will be denied until you
-      // update your rules.
-      allow read, write: if request.time < timestamp.date(2026, 1, 5);
+    // Users collection - authenticated users can read/write their own document
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+      
+      // User preferences subcollection (including cookie consent)
+      match /preferences/{preferenceId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+
+      // Children subcollection - parents can manage their children
+      match /children/{childId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+    }
+    
+    // Subscriptions - strictly managed by backend functions (admin)
+    // Users can read their own subscription via their user profile, but this collection is for admin/audit
+    match /subscriptions/{subscriptionId} {
+      allow read: if request.auth != null && request.auth.uid == resource.data.userId;
+      allow write: if false; // Only allow writes from Admin SDK (Functions)
+    }
+    
+    // Game data or leaderboards (if needed in future)
+    match /games/{gameId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+    
+    // Leaderboards - anyone can read, authenticated users can write
+    match /leaderboards/{leaderboardId} {
+      allow read: if true;
+      allow write: if request.auth != null;
     }
   }
 }

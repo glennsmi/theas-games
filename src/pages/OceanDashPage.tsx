@@ -5,6 +5,7 @@ import { createGameConfig, Difficulty, DIFFICULTY_CONFIG } from '@/games/ocean-d
 import { Button } from '@/components/ui/button'
 import { auth } from '@/config/firebase'
 import { updateUserPearls } from '@/services/userService'
+import { getChildren } from '@/services/parentService'
 import { cn } from '@/lib/utils'
 
 // Check if device supports native fullscreen API
@@ -19,6 +20,8 @@ const isIOS = () => {
          (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
 }
 
+import { useChild } from '@/context/ChildContext'
+
 export default function OceanDashPage() {
   const navigate = useNavigate()
   const gameRef = useRef<PhaserGameRef>(null)
@@ -29,6 +32,24 @@ export default function OceanDashPage() {
   const [showInfo, setShowInfo] = useState(false)
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [isPseudoFullscreen, setIsPseudoFullscreen] = useState(false) // For iOS fallback
+  
+  const { activeChild } = useChild()
+  
+  // Parse avatar config from active child
+  const avatarConfig = activeChild?.avatarConfig 
+    ? (() => {
+        try {
+          return JSON.parse(activeChild.avatarConfig)
+        } catch (e) {
+          console.error('Error parsing avatar config:', e)
+          return null
+        }
+      })()
+    : null
+
+  useEffect(() => {
+    setGameKey(prev => prev + 1)
+  }, [activeChild?.id, activeChild?.avatarConfig])
 
   // Listen for native fullscreen changes
   useEffect(() => {
@@ -133,7 +154,7 @@ export default function OceanDashPage() {
     setGameKey(prev => prev + 1) // Force game restart
   }
 
-  const gameConfig = createGameConfig(handleGameOver, difficulty)
+  const gameConfig = createGameConfig(handleGameOver, difficulty, avatarConfig)
 
   // If in pseudo-fullscreen mode, render a special fullscreen layout
   if (isPseudoFullscreen) {

@@ -50,7 +50,7 @@ export default function HomePage({ user }: HomePageProps) {
       <div className="w-full max-w-5xl px-4">
         <h2 className="text-3xl font-bold text-dark-navy text-center mb-8">Choose Your Adventure</h2>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {/* Simple Match Card */}
           <Card className="bg-white/90 backdrop-blur-sm border-2 border-pale-aqua hover:border-medium-teal transition-all duration-300 hover:shadow-xl transform hover:-translate-y-1 group">
             <CardHeader className="pb-2">
@@ -96,22 +96,43 @@ export default function HomePage({ user }: HomePageProps) {
             </CardFooter>
           </Card>
 
-          {/* Educational Match Card */}
+          {/* Pollution Patrol Card */}
           <Card className="bg-white/90 backdrop-blur-sm border-2 border-pale-aqua hover:border-medium-teal transition-all duration-300 hover:shadow-xl transform hover:-translate-y-1 group">
             <CardHeader className="pb-2">
-              <div className="text-4xl mb-2">📚</div>
-              <CardTitle className="text-xl text-dark-navy group-hover:text-medium-teal transition-colors">Educational Match</CardTitle>
-              <CardDescription className="text-medium-purple font-medium text-sm">Learn While You Play</CardDescription>
+              <div className="text-4xl mb-2">♻️</div>
+              <CardTitle className="text-xl text-dark-navy group-hover:text-medium-teal transition-colors">Pollution Patrol</CardTitle>
+              <CardDescription className="text-medium-purple font-medium text-sm">Ocean Cleanup Mission</CardDescription>
             </CardHeader>
             <CardContent className="pb-4">
               <p className="text-dark-navy/70 text-sm">
-                Match creatures to their names and explore ocean secrets.
+                Help Thea clean up the ocean by collecting trash while protecting marine life!
               </p>
             </CardContent>
             <CardFooter>
-              <Link to="/game" className="w-full">
+              <Link to="/pollution-patrol" className="w-full">
                 <Button variant="outline" className="w-full border-medium-teal text-medium-teal hover:bg-medium-teal hover:text-white">
                   Play
+                </Button>
+              </Link>
+            </CardFooter>
+          </Card>
+
+          {/* Character Creator Card */}
+          <Card className="bg-white/90 backdrop-blur-sm border-2 border-pale-aqua hover:border-medium-teal transition-all duration-300 hover:shadow-xl transform hover:-translate-y-1 group">
+            <CardHeader className="pb-2">
+              <div className="text-4xl mb-2">🎨</div>
+              <CardTitle className="text-xl text-dark-navy group-hover:text-medium-teal transition-colors">Character Creator</CardTitle>
+              <CardDescription className="text-medium-purple font-medium text-sm">Design Your Hero</CardDescription>
+            </CardHeader>
+            <CardContent className="pb-4">
+              <p className="text-dark-navy/70 text-sm">
+                Customize your character's look for Ocean Dash and Pollution Patrol!
+              </p>
+            </CardContent>
+            <CardFooter>
+              <Link to="/character-creation" className="w-full">
+                <Button variant="outline" className="w-full border-medium-teal text-medium-teal hover:bg-medium-teal hover:text-white">
+                  Customize
                 </Button>
               </Link>
             </CardFooter>
@@ -122,12 +143,15 @@ export default function HomePage({ user }: HomePageProps) {
       {/* Conservation Message */}
       <div className="max-w-4xl mx-auto text-center p-8 bg-white/60 backdrop-blur-md rounded-2xl border border-white/40 shadow-sm">
         <h2 className="text-2xl font-bold text-dark-navy mb-2">Protect Our Oceans</h2>
-        <p className="text-dark-navy/80">
+        <p className="text-dark-navy/80 mb-6">
           Every game you play helps us learn more about the beautiful creatures that call the ocean home.
         </p>
+        <Link to="/helping-the-environment">
+          <Button variant="outline" className="border-medium-teal text-medium-teal hover:bg-medium-teal hover:text-white transition-all">
+            Learn How We Help
+          </Button>
+        </Link>
       </div>
     </div>
   )
 }
-
-

@@ -188,6 +188,14 @@ export class GameScene extends Phaser.Scene {
     // The image is ~500px, scaled to 0.15 = ~75px, hitbox should be slightly smaller
     this.thea.body?.setSize(350, 400)
     this.thea.body?.setOffset(75, 50)
+
+    // Apply custom avatar config
+    const avatarConfig = this.registry.get('avatarConfig')
+    if (avatarConfig && avatarConfig.tint) {
+      this.thea.setTint(avatarConfig.tint)
+    } else {
+      this.thea.clearTint()
+    }
     
     // Gentle idle animation
     this.tweens.add({

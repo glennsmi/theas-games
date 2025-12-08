@@ -54,7 +54,8 @@ export const COLORS = {
 
 export const createGameConfig = (
   onGameOver?: (score: number, pearls: number) => void,
-  difficulty: Difficulty = 'easy'
+  difficulty: Difficulty = 'easy',
+  avatarConfig?: { tint?: number } | null
 ): Phaser.Types.Core.GameConfig => {
   return {
     type: Phaser.AUTO,
@@ -74,8 +75,11 @@ export const createGameConfig = (
         // Store callbacks in registry for scenes to access
         game.registry.set('onGameOver', onGameOver)
         game.registry.set('difficulty', difficulty)
+        game.registry.set('avatarConfig', avatarConfig)
       }
     }
   }
 }
+
+
 

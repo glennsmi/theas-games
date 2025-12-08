@@ -10,17 +10,21 @@ import {
   paginationSchema,
   COLLECTIONS,
   FirestoreUser
-} from '../../shared/dist';
+} from './shared';
+
+// Export webhook
+export * from './webhook';
 
 // Set global options for all functions
 setGlobalOptions({
   region: 'europe-west2',
   maxInstances: 10,
+  timeoutSeconds: 300,
+  memory: '512MiB'
 });
 
 // Initialize Firebase Admin
-admin.initializeApp();
-const db = admin.firestore();
+import { db } from './init';
 
 // CORS configuration
 const corsHandler = cors({ origin: true });
@@ -33,6 +37,8 @@ const convertTimestamps = (data: admin.firestore.DocumentData, id: string): User
     displayName: data.displayName,
     createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : new Date(data.createdAt),
     updatedAt: data.updatedAt?.toDate ? data.updatedAt.toDate() : new Date(data.updatedAt),
+    isParentVerified: data.isParentVerified || false,
+    subscription: data.subscription,
   };
 };
 
@@ -189,4 +195,4 @@ export const updateUser = onCall(async (request) => {
       error instanceof Error ? error.message : 'Invalid user data'
     );
   }
-}); 
+});

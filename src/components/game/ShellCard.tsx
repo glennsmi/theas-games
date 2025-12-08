@@ -46,7 +46,7 @@ export function ShellCard({ content, isOpen, isMatched, onClick }: ShellCardProp
       <div
         className={cn(
           "absolute inset-0 z-10 transition-all duration-700 ease-in-out origin-top",
-          isOpen || isMatched ? "-rotate-x-180 opacity-0" : "rotate-x-0 opacity-100"
+          isOpen || isMatched ? "-rotate-x-180 opacity-0 pointer-events-none" : "rotate-x-0 opacity-100"
         )}
         style={{ transformStyle: 'preserve-3d' }}
       >

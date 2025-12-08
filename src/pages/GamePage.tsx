@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { ShellCard } from '@/components/game/ShellCard'
@@ -23,6 +24,7 @@ type CardType = {
 const EMOJIS = ['🐠', '🐡', '🦈', '🐙', '🐚', '🦀', '🐬', '🐳', '🦑', '🦞', '🦐', '🦑', '🐊', '🐢', '🦎', '🐍', '🐲', '🐉', '🦕', '🦖']
 
 export default function GamePage() {
+  const navigate = useNavigate()
   const [level, setLevel] = useState<'easy' | 'medium' | 'hard'>('easy')
   const [gameMode, setGameMode] = useState<'practice' | 'multiplayer'>('practice')
   const [currentPlayer, setCurrentPlayer] = useState<1 | 2>(1)
@@ -487,9 +489,14 @@ export default function GamePage() {
               </div>
             )}
 
-            <Button size="lg" onClick={() => startNewGame(level, gameMode)} className="bg-medium-teal hover:bg-light-teal text-white w-full text-lg py-6 rounded-xl shadow-lg">
-              Play Again
-            </Button>
+            <div className="flex gap-3 w-full">
+              <Button size="lg" onClick={() => navigate('/')} className="bg-medium-purple hover:bg-deep-purple text-white flex-1 text-lg py-6 rounded-xl shadow-lg">
+                Home
+              </Button>
+              <Button size="lg" onClick={() => startNewGame(level, gameMode)} className="bg-medium-teal hover:bg-light-teal text-white flex-1 text-lg py-6 rounded-xl shadow-lg">
+                Play Again
+              </Button>
+            </div>
           </div>
         </div>
       )}
